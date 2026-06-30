@@ -1,0 +1,858 @@
+<!-- 칼로리 트래커: 영양정보 라벨(Nutrition Facts) 스타일 -->
+<div id="app-root"></div>
+<style>
+  :root{
+    --ink:#2f2147;
+    --paper:#faf7fd;
+    --line:#43305e;
+    --accent:#8b5cf6;
+    --accent-soft:#ede4fc;
+    --warn:#e0497a;
+    --warn-soft:#fce4ec;
+    --muted:#7a6f93;
+    --gridline:#43305e;
+  }
+  #app-root{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    max-width:480px;
+    margin:0 auto;
+    padding:0;
+  }
+  .label-box{
+    border:3px solid var(--line);
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .label-title{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+    border-bottom:8px solid var(--line);
+    padding-bottom:8px;
+    margin:0 0 6px 0;
+  }
+  .label-sub{
+    font-size:13px;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+    padding-bottom:8px;
+    margin-bottom:8px;
+  }
+  .kcal-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:4px solid var(--line);
+    padding:8px 0;
+  }
+  .kcal-row .label{font-size:18px;font-weight:700;}
+  .kcal-row .value{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .goal-bar-wrap{margin:10px 0 4px 0;}
+  .goal-bar-bg{
+    height:14px;
+    border:2px solid var(--line);
+    background:#fff;
+    position:relative;
+  }
+  .goal-bar-fill{
+    height:100%;
+    background:var(--accent);
+    transition:width .3s ease;
+  }
+  .goal-text{font-size:12px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;}
+
+  .form-section{
+    border:1px solid var(--line);
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .section-eyebrow{
+    font-size:14px;
+    letter-spacing:0.3px;
+    font-weight:800;
+    color:var(--ink);
+    margin-bottom:10px;
+    padding-left:10px;
+    border-left:5px solid var(--accent);
+    line-height:1.3;
+  }
+  .field-row{display:flex;gap:8px;margin-bottom:8px;}
+  .field-row input, .field-row select{
+    font-family:inherit;
+    border:2px solid var(--line);
+    background:#fff;
+    padding:8px 10px;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .field-row select{flex:1.4;}
+  .field-row input[type=text]{flex:1.4;}
+  .field-row input[type=number]{flex:0.8;width:0;}
+  datalist{}
+  .btn{
+    font-family:inherit;
+    border:2px solid var(--line);
+    background:var(--ink);
+    color:#fff;
+    padding:9px 14px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent);}
+  .btn-ghost{
+    background:#fff;color:var(--ink);
+  }
+  .btn-ghost:hover{background:var(--accent-soft);color:var(--ink);border-color:var(--ink);}
+  .row-actions{display:flex;gap:8px;}
+
+  .custom-toggle{
+    font-size:12px;
+    color:var(--muted);
+    text-decoration:underline;
+    cursor:pointer;
+    margin-bottom:8px;
+    display:inline-block;
+  }
+
+  .entry-list{border:1px solid var(--line);}
+  .entry-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 16px;
+    border-bottom:1px solid #ddd;
+    font-size:14px;
+  }
+  .entry-row:last-child{border-bottom:none;}
+  .entry-name{font-weight:600;}
+  .entry-meta{font-size:12px;color:var(--muted);}
+  .entry-kcal{font-weight:700;font-variant-numeric:tabular-nums;}
+  .entry-del{
+    background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;margin-left:8px;
+  }
+  .entry-del:hover{color:var(--warn);}
+  .entry-edit{
+    background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;margin-left:8px;
+  }
+  .entry-edit:hover{color:var(--accent);}
+  .edit-grams-row{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    margin:3px 0;
+  }
+  .edit-grams-input{
+    width:60px;
+    font-family:inherit;
+    border:2px solid var(--line);
+    padding:3px 6px;
+    font-size:13px;
+  }
+  .btn-small{
+    padding:3px 9px;
+    font-size:11.5px;
+  }
+  .empty-state{
+    padding:24px 16px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .footer-note{
+    font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;
+  }
+  .date-nav{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;
+  }
+  .date-nav button{
+    background:none;border:1px solid var(--line);padding:4px 10px;cursor:pointer;font-size:13px;
+  }
+  .date-nav button:hover{background:var(--accent-soft);}
+  .meal-tag{
+    display:inline-block;
+    font-size:10px;
+    border:1px solid var(--line);
+    padding:1px 6px;
+    margin-right:6px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .warn-banner{
+    margin-top:8px;
+    border:2px solid var(--warn);
+    background:var(--warn-soft);
+    color:var(--warn);
+    font-weight:700;
+    font-size:13px;
+    padding:8px 10px;
+  }
+  .praise-banner{
+    margin-top:8px;
+    border:2px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-weight:700;
+    font-size:13px;
+    padding:8px 10px;
+  }
+  .macro-summary{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid var(--line);
+  }
+  .macro-bar-wrap{margin-bottom:8px;}
+  .macro-bar{
+    display:flex;
+    height:20px;
+    border:2px solid var(--line);
+    overflow:hidden;
+    background:#fff;
+  }
+  .macro-seg{height:100%;transition:width .3s ease;}
+  .macro-legend{
+    display:flex;
+    gap:14px;
+    font-size:12px;
+    flex-wrap:wrap;
+  }
+  .macro-pct{color:var(--muted); margin-left:2px;}
+  .macro-item{display:flex;align-items:center;gap:5px;}
+  .macro-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .entry-macros{font-size:11px;color:var(--muted);margin-top:2px;}
+  .exercise-section{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .exercise-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .weight-input{font-weight:400; color:var(--muted); display:flex; align-items:center;}
+  .exercise-list{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    border:1px solid var(--line);
+  }
+  .exercise-row{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 10px;
+    font-size:12.5px;
+    border-bottom:1px solid #ddd;
+  }
+  .exercise-row:last-child{border-bottom:none;}
+  .exercise-name{color:var(--ink);}
+  .exercise-time{font-weight:700; font-variant-numeric:tabular-nums; color:var(--warn);}
+  .cuisine-tabs{display:flex;gap:6px;margin-bottom:10px;}
+  .cuisine-tab{
+    font-family:inherit;
+    border:2px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    padding:6px 14px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .cuisine-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .cuisine-tab:hover:not(.active){background:var(--accent-soft);}
+  .meal-block{margin-bottom:10px;}
+  .meal-block-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    padding-bottom:4px;
+    margin-bottom:4px;
+  }
+  .meal-block-kcal{font-size:12px;font-weight:700;color:var(--muted);}
+  .meal-item-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    padding:3px 0;
+  }
+  .meal-item-grams{color:var(--muted); font-size:12px;}
+  .meal-item-kcal{font-variant-numeric:tabular-nums;}
+  .plan-total-row{
+    display:flex;
+    justify-content:space-between;
+    border-top:2px solid var(--line);
+    padding-top:8px;
+    margin-top:6px;
+    font-weight:800;
+    font-size:14px;
+  }
+</style>
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+// 100g 기준 영양성분 데이터베이스 (식약처 식품영양성분 DB 참고 근사치)
+// [이름, kcal, 탄수화물(g), 단백질(g), 지방(g)] / 100g
+const FOOD_DB = [
+  ["백미밥",146,32,2.5,0.3],["현미밥",141,30,3.0,1.0],["보리밥",121,27,2.3,0.4],
+  ["식빵",267,49,9.0,3.5],["통밀빵",247,42,11,3.4],
+  ["라면(건면+스프)",500,68,9.0,18],["짜장면",149,22,5.5,4.0],["짬뽕",110,14,6.0,3.0],
+  ["김밥",150,22,5.0,4.0],["떡볶이",165,32,3.5,2.0],
+  ["순대",166,18,9.0,6.0],["치킨(후라이드)",260,10,18,16],["치킨(양념)",250,16,16,13],
+  ["삼겹살",331,0,17,29],["불고기",156,6.0,15,8.0],
+  ["돼지갈비",280,8.0,18,20],["소고기등심",215,0,20,14],["닭가슴살",110,0,23,1.5],
+  ["닭다리살",180,0,18,12],["계란",143,1.1,13,9.5],
+  ["계란후라이",196,1.0,14,15],["두부",84,2.0,8.0,4.5],["된장찌개",45,4.0,4.0,1.5],
+  ["김치찌개",65,5.0,5.0,3.0],["순두부찌개",55,3.0,5.0,2.5],
+  ["미역국",30,3.0,2.5,1.0],["삼계탕",116,3.0,12,6.0],["갈비탕",90,2.0,9.0,5.0],
+  ["설렁탕",70,1.5,8.0,3.5],["냉면",120,24,4.5,1.0],
+  ["비빔밥",130,20,4.5,3.5],["김치",18,3.0,1.5,0.3],["깍두기",20,4.0,1.0,0.2],
+  ["콩나물무침",35,4.0,3.0,1.2],["시금치나물",30,3.0,2.8,1.0],
+  ["멸치볶음",220,12,20,11],["계란찜",110,2.0,9.0,7.0],["고등어구이",183,0,20,11],
+  ["연어",208,0,20,13],["참치캔",128,0,24,3.0],
+  ["새우",99,0.2,21,1.0],["오징어",92,3.0,16,1.5],["문어",92,2.2,15,1.0],
+  ["우유",61,4.8,3.2,3.3],["요거트(플레인)",62,4.7,3.5,3.3],
+  ["그릭요거트",97,4.0,9.0,5.0],["치즈(체다)",403,1.3,25,33],["바나나",89,23,1.1,0.3],
+  ["사과",52,14,0.3,0.2],["딸기",33,8.0,0.7,0.3],
+  ["포도",69,18,0.6,0.2],["귤",47,12,0.8,0.2],["수박",30,8.0,0.6,0.2],
+  ["방울토마토",18,3.9,0.9,0.2],["고구마",128,30,1.6,0.1],
+  ["감자",77,17,2.0,0.1],["옥수수",96,21,3.4,1.5],["견과류(아몬드)",579,22,21,50],
+  ["땅콩",567,16,26,49],["초콜릿",546,58,5.0,32],
+  ["과자(감자칩)",536,53,6.0,35],["아이스크림",207,24,3.5,11],["케이크",371,52,5.0,16],
+  ["도넛",452,51,5.0,25],["피자",266,33,11,10],
+  ["파스타(크림)",170,18,5.0,8.0],["파스타(토마토)",130,20,4.0,3.0],
+  ["스테이크",271,0,26,18],["햄버거",295,28,15,14],
+  ["감자튀김",312,41,3.4,15],["콜라",42,10.6,0,0],["아메리카노",2,0.3,0.1,0],
+  ["카페라떼",60,4.8,3.2,3.3],["맥주",43,3.6,0.5,0],
+  ["소주",127,3.0,0,0],["막걸리",46,9.0,1.3,0.5],["와인",83,2.6,0.1,0],
+  ["오트밀",68,12,2.4,1.4],["그래놀라",471,64,10,17],
+  ["두유",54,4.0,3.6,2.5],["순두부",47,1.7,4.5,2.5],["만두",230,28,9.0,9.0],
+  ["잡채",155,20,3.0,7.0],["떡국",118,24,4.0,0.8],
+  ["삼각김밥",180,28,5.0,5.0],["샌드위치",250,28,10,11],["샐러드(드레싱포함)",80,7.0,2.0,5.0],
+  ["닭강정",290,22,14,16],
+  ["탕수육",230,24,9.0,11],["족발",235,1.0,20,17],["보쌈",215,2.0,19,14],
+  ["회(연어)",146,0,20,7.0],["회(참치)",144,0,23,5.0],
+];
+
+const macroLookupByName = {};
+FOOD_DB.forEach(([n,k,c,p,f]) => { macroLookupByName[n] = {kcal:k, carb:c, protein:p, fat:f}; });
+
+// 운동별 분당 소모 칼로리 (체중 70kg 성인 기준, MET값 × 체중(kg) × 3.5 / 200 공식 적용)
+// [운동명, MET, 분당kcal(70kg기준)]
+const EXERCISE_DB = [
+  ["걷기 (보통 속도, 5km/h)", 3.5, 4.3],
+  ["빠르게 걷기 (6km/h)", 5.0, 6.1],
+  ["달리기 (8km/h)", 8.3, 10.2],
+  ["달리기 (10km/h)", 9.8, 12.0],
+  ["자전거 타기 (보통)", 6.8, 8.3],
+  ["수영 (자유형, 보통)", 8.3, 10.2],
+  ["줄넘기", 11.0, 13.5],
+  ["등산", 7.0, 8.6],
+  ["계단 오르기", 8.8, 10.8],
+  ["요가", 2.5, 3.1],
+  ["웨이트 트레이닝 (보통)", 5.0, 6.1],
+  ["축구", 7.0, 8.6],
+  ["농구", 6.5, 8.0],
+  ["헬스 자전거 (고강도)", 10.5, 12.9],
+];
+
+// 목표 칼로리 맞춤 식단 템플릿 (기준 그램수, 목표 칼로리에 비례 조정됨)
+const MEAL_PLANS = {
+  "한식": [
+    { meal: "아침", name: "현미밥", grams: 150 },
+    { meal: "아침", name: "계란후라이", grams: 60 },
+    { meal: "아침", name: "시금치나물", grams: 50 },
+    { meal: "점심", name: "비빔밥", grams: 400 },
+    { meal: "점심", name: "미역국", grams: 200 },
+    { meal: "저녁", name: "불고기", grams: 150 },
+    { meal: "저녁", name: "백미밥", grams: 200 },
+    { meal: "저녁", name: "콩나물무침", grams: 50 },
+  ],
+  "중식": [
+    { meal: "아침", name: "만두", grams: 150 },
+    { meal: "점심", name: "짜장면", grams: 400 },
+    { meal: "저녁", name: "짬뽕", grams: 400 },
+    { meal: "저녁", name: "탕수육", grams: 150 },
+  ],
+  "양식": [
+    { meal: "아침", name: "샌드위치", grams: 150 },
+    { meal: "아침", name: "우유", grams: 200 },
+    { meal: "점심", name: "파스타(토마토)", grams: 350 },
+    { meal: "점심", name: "샐러드(드레싱포함)", grams: 100 },
+    { meal: "저녁", name: "스테이크", grams: 200 },
+    { meal: "저녁", name: "감자", grams: 150 },
+    { meal: "저녁", name: "샐러드(드레싱포함)", grams: 100 },
+  ],
+};
+
+const STORAGE_KEY_PREFIX = 'calorie-log:';
+const todayStr = () => {
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+};
+const addDays = (dateStr, n) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+};
+const fmtDateLabel = (dateStr) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  const w = ['일','월','화','수','목','금','토'][d.getDay()];
+  return `${d.getMonth()+1}월 ${d.getDate()}일 (${w})`;
+};
+
+function App(){
+  const [date, setDate] = useState(todayStr());
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [goal, setGoal] = useState(2000);
+  const [weight, setWeight] = useState(70);
+
+  const [foodName, setFoodName] = useState('');
+  const [grams, setGrams] = useState('');
+  const [customMode, setCustomMode] = useState(false);
+  const [customKcalPer100, setCustomKcalPer100] = useState('');
+  const [selectedCuisine, setSelectedCuisine] = useState('한식');
+
+  const scaledMealPlan = useMemo(() => {
+    const template = MEAL_PLANS[selectedCuisine];
+    const baseTotal = template.reduce((s, item) => {
+      const m = macroLookupByName[item.name];
+      return s + (m ? m.kcal * item.grams / 100 : 0);
+    }, 0);
+    const scale = baseTotal > 0 ? goal / baseTotal : 1;
+    const items = template.map(item => {
+      const m = macroLookupByName[item.name] || {kcal:0,carb:0,protein:0,fat:0};
+      const g = Math.round(item.grams * scale / 10) * 10; // 10g 단위로 보기 좋게 반올림
+      const ratio = g / 100;
+      return {
+        meal: item.meal,
+        name: item.name,
+        grams: g,
+        kcal: Math.round(m.kcal * ratio),
+        carb: Math.round(m.carb * ratio * 10) / 10,
+        protein: Math.round(m.protein * ratio * 10) / 10,
+        fat: Math.round(m.fat * ratio * 10) / 10,
+      };
+    });
+    const totalKcal = items.reduce((s,i) => s + i.kcal, 0);
+    return { items, totalKcal };
+  }, [selectedCuisine, goal]);
+
+  const key = STORAGE_KEY_PREFIX + date;
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load(){
+      setLoading(true);
+      try{
+        const res = await window.storage.get(key, false);
+        if(!cancelled){
+          setEntries(res && res.value ? JSON.parse(res.value) : []);
+        }
+      }catch(e){
+        if(!cancelled) setEntries([]);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [date]);
+
+  useEffect(() => {
+    async function loadGoal(){
+      try{
+        const res = await window.storage.get('calorie-goal', false);
+        if(res && res.value) setGoal(JSON.parse(res.value));
+      }catch(e){ /* no goal set yet */ }
+    }
+    loadGoal();
+    async function loadWeight(){
+      try{
+        const res = await window.storage.get('user-weight', false);
+        if(res && res.value) setWeight(JSON.parse(res.value));
+      }catch(e){ /* no weight set yet */ }
+    }
+    loadWeight();
+  }, []);
+
+  const saveWeight = async (val) => {
+    setWeight(val);
+    try{
+      await window.storage.set('user-weight', JSON.stringify(val), false);
+    }catch(e){ console.error('체중 저장 실패', e); }
+  };
+
+  const saveEntries = async (next) => {
+    setEntries(next);
+    try{
+      await window.storage.set(key, JSON.stringify(next), false);
+    }catch(e){ console.error('저장 실패', e); }
+  };
+
+  const saveGoal = async (val) => {
+    setGoal(val);
+    try{
+      await window.storage.set('calorie-goal', JSON.stringify(val), false);
+    }catch(e){ console.error('목표 저장 실패', e); }
+  };
+
+  const total = useMemo(() => entries.reduce((s,e) => s + e.kcal, 0), [entries]);
+  const macroTotals = useMemo(() => entries.reduce((acc,e) => ({
+    carb: acc.carb + (e.carb||0),
+    protein: acc.protein + (e.protein||0),
+    fat: acc.fat + (e.fat||0),
+  }), {carb:0, protein:0, fat:0}), [entries]);
+  const macroPct = useMemo(() => {
+    const carbKcal = macroTotals.carb * 4;
+    const proteinKcal = macroTotals.protein * 4;
+    const fatKcal = macroTotals.fat * 9;
+    const sumKcal = carbKcal + proteinKcal + fatKcal;
+    if(sumKcal <= 0) return {carb:0, protein:0, fat:0};
+    return {
+      carb: Math.round(carbKcal/sumKcal*100),
+      protein: Math.round(proteinKcal/sumKcal*100),
+      fat: Math.round(fatKcal/sumKcal*100),
+    };
+  }, [macroTotals]);
+  const pct = Math.min(100, Math.round((total/goal)*100) || 0);
+  const isOverGoal = total > goal;
+  const overAmount = total - goal;
+  const isNearGoal = !isOverGoal && goal > 0 && total >= goal * 0.9 && total > 0;
+  const praiseMessages = [
+    "오늘 칼로리 관리 완벽해요! 목표에 딱 맞췄네요 👏",
+    "훌륭해요! 목표 칼로리를 알맞게 지켰어요.",
+    "잘 하고 계세요! 이 페이스 그대로 유지해보세요.",
+    "오늘 식단 균형이 아주 좋아요!",
+  ];
+  const praiseMessage = useMemo(() => praiseMessages[Math.floor(Math.random() * praiseMessages.length)], [date, isNearGoal]);
+
+  const matchedFood = FOOD_DB.find(f => f[0] === foodName);
+
+  const handleAdd = () => {
+    const g = parseFloat(grams);
+    if(!g || g <= 0) return;
+    let kcalPer100, name, carbPer100=0, proteinPer100=0, fatPer100=0;
+    if(customMode){
+      const c = parseFloat(customKcalPer100);
+      if(!c || c <= 0) return;
+      kcalPer100 = c;
+      name = foodName.trim() || '직접 입력 음식';
+      // 직접 입력은 칼로리만 알 수 있어 탄/단/지는 추정 불가로 0 처리
+    } else {
+      if(!matchedFood) return;
+      const m = macroLookupByName[matchedFood[0]];
+      kcalPer100 = m.kcal; carbPer100 = m.carb; proteinPer100 = m.protein; fatPer100 = m.fat;
+      name = matchedFood[0];
+    }
+    const ratio = g / 100;
+    const kcal = Math.round(kcalPer100 * ratio);
+    const carb = Math.round(carbPer100 * ratio * 10) / 10;
+    const protein = Math.round(proteinPer100 * ratio * 10) / 10;
+    const fat = Math.round(fatPer100 * ratio * 10) / 10;
+    const next = [...entries, { id: Date.now(), name, grams: g, kcal, kcalPer100, carb, protein, fat, carbPer100, proteinPer100, fatPer100, isCustom: customMode }];
+    saveEntries(next);
+    setFoodName(''); setGrams(''); setCustomKcalPer100('');
+  };
+
+  const handleDelete = (id) => {
+    saveEntries(entries.filter(e => e.id !== id));
+  };
+
+  const [editingId, setEditingId] = useState(null);
+  const [editGrams, setEditGrams] = useState('');
+
+  const startEdit = (entry) => {
+    setEditingId(entry.id);
+    setEditGrams(String(entry.grams));
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditGrams('');
+  };
+
+  const saveEdit = (entry) => {
+    const g = parseFloat(editGrams);
+    if(!g || g <= 0) return;
+    const ratio = g / 100;
+    // 과거 저장 데이터 호환: per100 필드가 없으면 기존 grams 기준으로 역산
+    const kcalPer100 = entry.kcalPer100 ?? (entry.grams ? entry.kcal / (entry.grams/100) : 0);
+    const carbPer100 = entry.carbPer100 ?? (entry.grams ? (entry.carb||0) / (entry.grams/100) : 0);
+    const proteinPer100 = entry.proteinPer100 ?? (entry.grams ? (entry.protein||0) / (entry.grams/100) : 0);
+    const fatPer100 = entry.fatPer100 ?? (entry.grams ? (entry.fat||0) / (entry.grams/100) : 0);
+    const updated = {
+      ...entry,
+      grams: g,
+      kcal: Math.round(kcalPer100 * ratio),
+      carb: Math.round(carbPer100 * ratio * 10) / 10,
+      protein: Math.round(proteinPer100 * ratio * 10) / 10,
+      fat: Math.round(fatPer100 * ratio * 10) / 10,
+      kcalPer100, carbPer100, proteinPer100, fatPer100,
+    };
+    saveEntries(entries.map(e => e.id === entry.id ? updated : e));
+    setEditingId(null);
+    setEditGrams('');
+  };
+
+  return (
+    <div>
+      <div className="label-box">
+        <div className="label-title">오늘의 칼로리</div>
+        <div className="date-nav">
+          <button onClick={() => setDate(addDays(date,-1))}>◀ 이전</button>
+          <span style={{fontWeight:700}}>{fmtDateLabel(date)}</span>
+          <button onClick={() => setDate(addDays(date,1))}>다음 ▶</button>
+        </div>
+        <div className="kcal-row">
+          <span className="label">섭취 칼로리</span>
+          <span className="value">{loading ? '...' : total.toLocaleString()}<span style={{fontSize:16,fontWeight:600}}> kcal</span></span>
+        </div>
+        <div className="goal-bar-wrap">
+          <div className="goal-bar-bg">
+            <div className="goal-bar-fill" style={{width: pct + '%', background: isOverGoal ? 'var(--warn)' : 'var(--accent)'}}></div>
+          </div>
+          <div className="goal-text">
+            <span>목표 대비 {pct}%</span>
+            <span>
+              목표:
+              <input
+                type="number"
+                value={goal}
+                onChange={e => saveGoal(parseInt(e.target.value)||0)}
+                style={{width:60, marginLeft:4, border:'1px solid var(--line)', padding:'1px 4px', fontFamily:'inherit'}}
+              /> kcal
+            </span>
+          </div>
+        </div>
+        {isNearGoal && (
+          <div className="praise-banner">
+            🎉 {praiseMessage}
+          </div>
+        )}
+        {isOverGoal && (
+          <div className="warn-banner">
+            ⚠ 목표 칼로리를 {overAmount.toLocaleString()} kcal 초과했어요.
+          </div>
+        )}
+        {isOverGoal && (
+          <div className="exercise-section">
+            <div className="exercise-header">
+              <span>초과분 {overAmount.toLocaleString()} kcal 소모하려면</span>
+              <span className="weight-input">
+                체중
+                <input
+                  type="number"
+                  value={weight}
+                  onChange={e => saveWeight(parseInt(e.target.value)||70)}
+                  style={{width:44, marginLeft:4, marginRight:2, border:'1px solid var(--line)', padding:'1px 4px', fontFamily:'inherit'}}
+                />kg
+              </span>
+            </div>
+            <div className="exercise-list">
+              {EXERCISE_DB.map(([name, met, kcalPerMinAt70]) => {
+                const kcalPerMin = kcalPerMinAt70 * (weight/70);
+                const minutes = Math.ceil(overAmount / kcalPerMin);
+                return (
+                  <div className="exercise-row" key={name}>
+                    <span className="exercise-name">{name}</span>
+                    <span className="exercise-time">약 {minutes}분</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="footer-note" style={{marginTop:6}}>
+              MET(운동대사당량) 공식 기준 추정치이며, 개인 체력·강도에 따라 실제 소모량은 달라질 수 있습니다.
+            </div>
+          </div>
+        )}
+        <div className="macro-summary">
+          <div className="macro-bar-wrap">
+            <div className="macro-bar">
+              <div className="macro-seg" style={{width: macroPct.carb + '%', background:'#6c4fd1'}}></div>
+              <div className="macro-seg" style={{width: macroPct.protein + '%', background:'#e0497a'}}></div>
+              <div className="macro-seg" style={{width: macroPct.fat + '%', background:'#f2a93c'}}></div>
+            </div>
+          </div>
+          <div className="macro-legend">
+            <div className="macro-item">
+              <span className="macro-dot" style={{background:'#6c4fd1'}}></span>
+              탄수화물 <b>{macroTotals.carb.toFixed(1)}g</b>
+              <span className="macro-pct">({macroPct.carb}%)</span>
+            </div>
+            <div className="macro-item">
+              <span className="macro-dot" style={{background:'#e0497a'}}></span>
+              단백질 <b>{macroTotals.protein.toFixed(1)}g</b>
+              <span className="macro-pct">({macroPct.protein}%)</span>
+            </div>
+            <div className="macro-item">
+              <span className="macro-dot" style={{background:'#f2a93c'}}></span>
+              지방 <b>{macroTotals.fat.toFixed(1)}g</b>
+              <span className="macro-pct">({macroPct.fat}%)</span>
+            </div>
+          </div>
+          <div className="footer-note" style={{marginTop:4, textAlign:'left'}}>
+            비율은 탄수화물 4kcal/g · 단백질 4kcal/g · 지방 9kcal/g 기준, 각 영양소가 차지하는 칼로리 비중입니다.
+          </div>
+        </div>
+      </div>
+
+      <div className="form-section">
+        <div className="section-eyebrow">음식 추가</div>
+        {!customMode ? (
+          <div className="field-row">
+            <input
+              list="food-options"
+              type="text"
+              placeholder="음식명 입력 또는 선택"
+              value={foodName}
+              onChange={e => setFoodName(e.target.value)}
+            />
+            <datalist id="food-options">
+              {FOOD_DB.map(([n]) => <option key={n} value={n} />)}
+            </datalist>
+            <input
+              type="number"
+              placeholder="g"
+              value={grams}
+              onChange={e => setGrams(e.target.value)}
+            />
+          </div>
+        ) : (
+          <div className="field-row">
+            <input
+              type="text"
+              placeholder="음식명"
+              value={foodName}
+              onChange={e => setFoodName(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="100g당 kcal"
+              value={customKcalPer100}
+              onChange={e => setCustomKcalPer100(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="g"
+              value={grams}
+              onChange={e => setGrams(e.target.value)}
+            />
+          </div>
+        )}
+
+        <span className="custom-toggle" onClick={() => setCustomMode(!customMode)}>
+          {customMode ? '← 목록에서 선택하기' : '목록에 없는 음식이면 직접 칼로리 입력하기 →'}
+        </span>
+
+        <div className="row-actions">
+          <button className="btn" onClick={handleAdd}>+ 추가하기</button>
+        </div>
+        {!customMode && foodName && !matchedFood && (
+          <div style={{fontSize:12, color:'var(--accent)', marginTop:6}}>
+            목록에 없는 음식이에요. "직접 칼로리 입력하기"를 눌러주세요.
+          </div>
+        )}
+      </div>
+
+      <div className="section-eyebrow" style={{marginBottom:6}}>오늘 먹은 음식 ({entries.length})</div>
+      <div className="entry-list">
+        {loading ? (
+          <div className="empty-state">불러오는 중...</div>
+        ) : entries.length === 0 ? (
+          <div className="empty-state">아직 기록한 음식이 없어요.</div>
+        ) : entries.map(e => (
+          <div className="entry-row" key={e.id}>
+            <div>
+              <div className="entry-name">{e.name}</div>
+              {editingId === e.id ? (
+                <div className="edit-grams-row">
+                  <input
+                    type="number"
+                    value={editGrams}
+                    onChange={ev => setEditGrams(ev.target.value)}
+                    className="edit-grams-input"
+                    autoFocus
+                  />
+                  <span style={{fontSize:12, color:'var(--muted)'}}>g</span>
+                  <button className="btn btn-small" onClick={() => saveEdit(e)}>저장</button>
+                  <button className="btn btn-ghost btn-small" onClick={cancelEdit}>취소</button>
+                </div>
+              ) : (
+                <div className="entry-meta">{e.grams}g · {e.kcalPer100}kcal/100g</div>
+              )}
+              <div className="entry-macros">
+                {e.isCustom
+                  ? '영양성분 정보 없음 (직접 입력)'
+                  : `탄 ${e.carb}g · 단 ${e.protein}g · 지 ${e.fat}g`}
+              </div>
+            </div>
+            <div style={{display:'flex', alignItems:'center'}}>
+              <span className="entry-kcal">{e.kcal} kcal</span>
+              {editingId !== e.id && (
+                <button className="entry-edit" onClick={() => startEdit(e)}>✎</button>
+              )}
+              <button className="entry-del" onClick={() => handleDelete(e.id)}>✕</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="form-section">
+        <div className="section-eyebrow">목표 칼로리({goal.toLocaleString()}kcal) 맞춤 식단 추천</div>
+        <div className="cuisine-tabs">
+          {Object.keys(MEAL_PLANS).map(c => (
+            <button
+              key={c}
+              className={"cuisine-tab" + (selectedCuisine === c ? " active" : "")}
+              onClick={() => setSelectedCuisine(c)}
+            >{c}</button>
+          ))}
+        </div>
+        {["아침","점심","저녁"].map(mealTime => {
+          const mealItems = scaledMealPlan.items.filter(i => i.meal === mealTime);
+          if(mealItems.length === 0) return null;
+          const mealKcal = mealItems.reduce((s,i)=>s+i.kcal,0);
+          return (
+            <div className="meal-block" key={mealTime}>
+              <div className="meal-block-header">
+                <span className="meal-tag">{mealTime}</span>
+                <span className="meal-block-kcal">{mealKcal} kcal</span>
+              </div>
+              {mealItems.map(i => (
+                <div className="meal-item-row" key={i.name}>
+                  <span>{i.name} <span className="meal-item-grams">{i.grams}g</span></span>
+                  <span className="meal-item-kcal">{i.kcal} kcal</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+        <div className="plan-total-row">
+          <span>하루 합계</span>
+          <span>{scaledMealPlan.totalKcal.toLocaleString()} kcal <span style={{color:'var(--muted)', fontWeight:400}}>(목표 {goal.toLocaleString()}kcal)</span></span>
+        </div>
+        <div className="footer-note" style={{marginTop:4}}>
+          1끼 분량을 10g 단위로 반올림해 목표 칼로리에 맞춘 예시 식단입니다. 실제 섭취량은 기호에 맞게 조절하세요.
+        </div>
+      </div>
+
+      <div className="footer-note">
+        칼로리는 식품의약품안전처 식품영양성분 DB를 참고한 100g당 평균값 기준 추정치이며,<br/>
+        실제 섭취 칼로리는 조리법·브랜드에 따라 달라질 수 있습니다.<br/>
+        목록에 없는 음식은 "직접 입력"으로 정확한 값을 넣어주세요.
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app-root')).render(<App />);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
