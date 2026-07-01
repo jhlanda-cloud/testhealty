@@ -366,6 +366,25 @@
     flex-wrap:wrap;
     gap:4px;
   }
+  .tip-section{
+    border:1px solid var(--line);
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .video-wrap{
+    position:relative;
+    width:100%;
+    padding-bottom:56.25%; /* 16:9 비율 */
+    height:0;
+    overflow:hidden;
+    margin-top:10px;
+  }
+  .video-wrap iframe{
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:100%;
+    border:0;
+  }
 </style>
 <script type="text/babel">
 const { useState, useEffect, useMemo } = React;
@@ -913,6 +932,20 @@ function App(){
         </div>
         <div className="footer-note" style={{marginTop:4}}>
           1끼 분량을 10g 단위로 반올림해 목표 칼로리에 맞춘 예시 식단입니다. 실제 섭취량은 기호에 맞게 조절하세요.
+        </div>
+      </div>
+
+      <div className="tip-section">
+        <div className="section-eyebrow">오늘의 다이어트 팁</div>
+        <div className="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/aXcWn7VuuE8?si=XyyriEvPLscTwt_h"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
         </div>
       </div>
 
